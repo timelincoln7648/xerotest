@@ -21,5 +21,3 @@ app.get("/", function(req, res){
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("server started homie");
 });
-
-console.log("test from app.js");
