@@ -3,6 +3,11 @@ var app = express();
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 
+//add Xero
+const xero = require('xero-node');
+const fs = require('fs');
+const config = require("./config.json");
+
 
 
 //general setup
