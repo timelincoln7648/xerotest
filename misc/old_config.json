@@ -1,0 +1,9 @@
+{
+    "userAgent" : "REPLACE ME",
+    "consumerKey": "AAAAAAAAAAAAAAAAAA",
+    "consumerSecret": "BBBBBBBBBBBBBBBBBBBB",
+    "authorizeCallbackUrl": "https://www.mywebsite.com/xerocallback",
+    "privateKeyPath" : "/some/path/to/partner_privatekey.pem",
+    "runscopeBucketId" : "xxxyyyzzzz",
+    "redirectOnError" : true
+}
