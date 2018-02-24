@@ -37,7 +37,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 function getXeroClient(session) {
     try {
-        metaConfig = require('config.json');
+        metaConfig = require('./config.json');
     } catch (ex) {
         if (process && process.env && process.env.APPTYPE) {
             //no config file found, so check the process.env.
@@ -89,6 +89,7 @@ function getXeroClient(session) {
     return xeroClient;
 }
 
+//OAuth to Xero
 function authorizeRedirect(req, res, returnTo) {
     var xeroClient = getXeroClient(req.session, returnTo);
     xeroClient.getRequestToken(function(err, token, secret) {
@@ -113,7 +114,8 @@ function authorizeRedirect(req, res, returnTo) {
 
 function authorizedOperation(req, res, returnTo, callback) {
     if (req.session.token) {
-      callback(getXeroClient(req.session));
+        console.log("already OAuthed to Xero, passing xeroClient to callback function");
+        callback(getXeroClient(req.session));
     } else {
       authorizeRedirect(req, res, returnTo);
     }
@@ -136,9 +138,6 @@ app.get('/error', function(req, res) {
     res.render('home', { error: req.query.error });
 })
 
-// app.get("/", function(req, res){
-//     res.render("home");
-// });
 
 // Home Page
 app.get('/', function(req, res) {
@@ -149,6 +148,46 @@ app.get('/', function(req, res) {
     });
 });
 
+app.get('/initialConnect', function(req, res){
+    authorizedOperation(req, res, '/', function(xeroClient) {
+        //once connected do the below
+        console.log("succesfully connected to Xero!");
+        // xeroClient.core.organisations.getOrganisations()
+        //     .then(function(organisations) {
+        //         res.render('organisations', {
+        //             organisations: organisations,
+        //             active: {
+        //                 organisations: true,
+        //                 nav: {
+        //                     accounting: true
+        //                 }
+        //             }
+        //         });
+        //     })
+        //     .catch(function(err) {
+        //         handleErr(err, req, res, 'organisations');
+        //     })
+    });
+});
+
+// Redirected from xero with oauth results
+app.get('/access', function(req, res) {
+    var xeroClient = getXeroClient();
+
+    if (req.query.oauth_verifier && req.query.oauth_token == req.session.oauthRequestToken) {
+        xeroClient.setAccessToken(req.session.oauthRequestToken, req.session.oauthRequestSecret, req.query.oauth_verifier)
+            .then(function(token) {
+                req.session.token = token.results;
+                console.log(req.session);
+
+                var returnTo = req.session.returnto;
+                res.redirect(returnTo || '/');
+            })
+            .catch(function(err) {
+                handleErr(err, req, res, 'error');
+            })
+    }
+});
 
 
 
