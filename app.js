@@ -4,7 +4,6 @@ var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 
 
-
 //add Xero
 const xero = require('xero-node');
 const fs = require('fs');
@@ -33,9 +32,142 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-//SETUP XERO
+//
+//MY Variables
+//
+
+var connectedToXero = false;
+var connectedXeroOrgName = "";
+var orgData = {
+    name: "",
+    countryCode: ""
+}
+
+
+
+//ROUTES
+
+// Home Page
+app.get('/', function(req, res) {
+    
+//pass setOrgData to authorizedOperation, PUT RENDER IN CALLBACK
+    
+    // //authorizedOperation(req, res, "/", setOrgData);
+    // setOrgData(getXeroClient(req.session));
+    
+    // //pass org data object into render of home page so you can display data in ejs on the home page
+    
+    res.render('home', {
+        active: {
+            overview: true
+        }
+    });
+    
+    
+    
+//code to get organisation data (from sample app) isn't working below
+    
+    // authorizedOperation(req, res, '/', function(xeroClient) {
+    //     xeroClient.core.organisations.getOrganisations()
+    //         .then(function(organisations) {
+    //             orgData.name = organisations[0].name;
+    //             console.log("org name set in orgData to: "+orgData.name);
+    //             console.log("organisations object: \n"+ organisations.toString());
+    //             res.render('home', {
+    //                 organisations: organisations,
+    //                 active: {
+    //                     organisations: true,
+    //                 }});
+    //         })
+    //         .catch(function(err) {
+    //             handleErr(err, req, res, 'organisations');
+    //         })
+    // });
+});
+
+
+app.get('/organisationDetails', function(req, res){
+    console.log("loading organisation details page...");
+    //res.render('organisationDetails');
+    
+    authorizedOperation(req, res, '/organisationDetails', function(xeroClient) {
+        xeroClient.core.organisations.getOrganisations()
+            .then(function(organisations) {
+                console.log("organisation.length is: "+organisations.length);
+                console.log("\norganisations object: \n"+organisations+"\n");
+                
+                var firstOrg = organisations[0];
+                var orgName = firstOrg.Name;
+                console.log("firstOrg.Name is: "+orgName);
+                
+                
+                
+                res.render('organisationDetails', {
+                    organisations: organisations,
+                    theOrg: firstOrg,
+                    active: {
+                        organisations: true,
+                        nav: {
+                            accounting: true
+                        }
+                    }
+                });
+            })
+            .catch(function(err) {
+                handleErr(err, req, res, 'organisationDetails');
+            })
+    })
+    
+});
+
+
+app.get('/initialConnect', function(req, res){
+    authorizedOperation(req, res, '/', function(xeroClient) {
+        console.log("this doesn't seem to ever execute...");
+    });
+});
+
+// Redirected from xero with oauth results
+app.get('/access', function(req, res) {
+    var xeroClient = getXeroClient();
+
+    if (req.query.oauth_verifier && req.query.oauth_token == req.session.oauthRequestToken) {
+        xeroClient.setAccessToken(req.session.oauthRequestToken, req.session.oauthRequestSecret, req.query.oauth_verifier)
+            .then(function(token) {
+                req.session.token = token.results;
+                console.log(req.session);
+
+                var returnTo = req.session.returnto;
+                res.redirect(returnTo || '/');
+            })
+            .catch(function(err) {
+                handleErr(err, req, res, 'error');
+            })
+    }
+});
+
+
+app.get('/error', function(req, res) {
+    console.log(req.query.error);
+    res.render('home', { error: req.query.error });
+})
+
+
+//
+//MY HELPERS
+//
+
+function setOrgData(xeroClient) {
+    //try just printing it first
+    console.log("about to print some org data from setOrgData function...");
+}
+
+
+
+//XERO Helpers
 
 function getXeroClient(session) {
+    //get the config details from file or env
     try {
         metaConfig = require('./config.json');
     } catch (ex) {
@@ -129,65 +261,6 @@ function handleErr(err, req, res, returnTo) {
         res.redirect('error', err);
     }
 }
-
-
-//ROUTES
-
-app.get('/error', function(req, res) {
-    console.log(req.query.error);
-    res.render('home', { error: req.query.error });
-})
-
-
-// Home Page
-app.get('/', function(req, res) {
-    res.render('home', {
-        active: {
-            overview: true
-        }
-    });
-});
-
-app.get('/initialConnect', function(req, res){
-    authorizedOperation(req, res, '/', function(xeroClient) {
-        //once connected do the below
-        console.log("succesfully connected to Xero!");
-        // xeroClient.core.organisations.getOrganisations()
-        //     .then(function(organisations) {
-        //         res.render('organisations', {
-        //             organisations: organisations,
-        //             active: {
-        //                 organisations: true,
-        //                 nav: {
-        //                     accounting: true
-        //                 }
-        //             }
-        //         });
-        //     })
-        //     .catch(function(err) {
-        //         handleErr(err, req, res, 'organisations');
-        //     })
-    });
-});
-
-// Redirected from xero with oauth results
-app.get('/access', function(req, res) {
-    var xeroClient = getXeroClient();
-
-    if (req.query.oauth_verifier && req.query.oauth_token == req.session.oauthRequestToken) {
-        xeroClient.setAccessToken(req.session.oauthRequestToken, req.session.oauthRequestSecret, req.query.oauth_verifier)
-            .then(function(token) {
-                req.session.token = token.results;
-                console.log(req.session);
-
-                var returnTo = req.session.returnto;
-                res.redirect(returnTo || '/');
-            })
-            .catch(function(err) {
-                handleErr(err, req, res, 'error');
-            })
-    }
-});
 
 
 
