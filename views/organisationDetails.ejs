@@ -12,6 +12,12 @@
     <p>
         <span class="DataTitle">Country Code: </span><%= theOrg["CountryCode"] %>
     </p>
+    <p>
+        <span class="DataTitle">Address: </span><%= theOrg["Addresses"][0]["AddressLine1"] %>,  <%= theOrg["Addresses"][0]["City"] %>
+    </p>
+    <p>
+        <span class="DataTitle">Phone: </span><%= theOrg["Phones"][0]["PhoneNumber"] %>
+    </p>
 <hr>
 
 
