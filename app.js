@@ -32,57 +32,13 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-//
-//MY Variables
-//
-
-var connectedToXero = false;
-var connectedXeroOrgName = "";
-var orgData = {
-    name: "",
-    countryCode: ""
-}
-
 
 
 //ROUTES
 
 // Home Page
 app.get('/', function(req, res) {
-    
-//pass setOrgData to authorizedOperation, PUT RENDER IN CALLBACK
-    
-    // //authorizedOperation(req, res, "/", setOrgData);
-    // setOrgData(getXeroClient(req.session));
-    
-    // //pass org data object into render of home page so you can display data in ejs on the home page
-    
-    res.render('home', {
-        active: {
-            overview: true
-        }
-    });
-    
-    
-    
-//code to get organisation data (from sample app) isn't working below
-    
-    // authorizedOperation(req, res, '/', function(xeroClient) {
-    //     xeroClient.core.organisations.getOrganisations()
-    //         .then(function(organisations) {
-    //             orgData.name = organisations[0].name;
-    //             console.log("org name set in orgData to: "+orgData.name);
-    //             console.log("organisations object: \n"+ organisations.toString());
-    //             res.render('home', {
-    //                 organisations: organisations,
-    //                 active: {
-    //                     organisations: true,
-    //                 }});
-    //         })
-    //         .catch(function(err) {
-    //             handleErr(err, req, res, 'organisations');
-    //         })
-    // });
+    res.render('home');
 });
 
 
@@ -93,15 +49,7 @@ app.get('/organisationDetails', function(req, res){
     authorizedOperation(req, res, '/organisationDetails', function(xeroClient) {
         xeroClient.core.organisations.getOrganisations()
             .then(function(organisations) {
-                console.log("organisation.length is: "+organisations.length);
-                console.log("\norganisations object: \n"+organisations+"\n");
-                
                 var firstOrg = organisations[0];
-                var orgName = firstOrg.Name;
-                console.log("firstOrg.Name is: "+orgName);
-                
-                
-                
                 res.render('organisationDetails', {
                     organisations: organisations,
                     theOrg: firstOrg,
@@ -117,14 +65,33 @@ app.get('/organisationDetails', function(req, res){
                 handleErr(err, req, res, 'organisationDetails');
             })
     })
+});
+
+app.get('/connectionSettings', function(req, res){
+    var connectionStatus = connectedToXero(req);
     
+    res.render('connectionSettings',
+        {
+            connectionStatus: connectionStatus
+        }
+    );
 });
 
 
 app.get('/initialConnect', function(req, res){
-    authorizedOperation(req, res, '/', function(xeroClient) {
+    authorizedOperation(req, res, '/connectionSettings', function(xeroClient) {
         console.log("this doesn't seem to ever execute...");
     });
+});
+
+app.get('/disconnectXero', function(req, res){
+   if (req.session.token) {
+       //delete token
+       req.session.token = "";
+   } else {
+       console.log("no token to delete...");
+   }
+   res.redirect('/connectionSettings')
 });
 
 // Redirected from xero with oauth results
@@ -157,9 +124,13 @@ app.get('/error', function(req, res) {
 //MY HELPERS
 //
 
-function setOrgData(xeroClient) {
-    //try just printing it first
-    console.log("about to print some org data from setOrgData function...");
+
+function connectedToXero(req){
+    if (req.session.token) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 

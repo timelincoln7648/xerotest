@@ -7,10 +7,27 @@
   margin-top: 7.0em;
 }
 
+.DataTitle {
+  font-weight: bold;
+  font-size: larger;
+}
+
+#mainBox {
+  text-align: center;
+}
+
+#smallBox {
+  width: 25%;
+}
+
 h1 {
     margin-left: 2em;
 }
 
-p {
+p span {
+  margin-left: 2em;
+}
+
+body {
   margin-left: 2em;
 }

@@ -2,14 +2,15 @@
 
 
 <div class="ui main text container segment">
-      <div id="mainBox" class="ui huge header">Xero Test App</div>
-      
+    <div id="mainBox" class="ui huge header">Xero Organisation Details</div>
 </div>
 
 <hr>
     <p>
-        <h3><p>Your Xero Organisation: <%= theOrg["Name"] %></p></h3>
-        <h3><p>Your Xero Organisation: <%= organisations[0]["Name"] %></p></h3>
+        <span class="DataTitle">Your Xero Organisation: </span><%= theOrg["Name"] %>
+    </p>
+    <p>
+        <span class="DataTitle">Country Code: </span><%= theOrg["CountryCode"] %>
     </p>
 <hr>
 
