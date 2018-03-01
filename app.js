@@ -74,7 +74,6 @@ app.get('/manageContacts', function(req, res){
         var contacts = [];
         xeroClient.core.contacts.getContacts({ pager: { callback: pagerCallback } })
             .then(function() {
-                console.log("the length of the contacts array is: "+contacts.length);
                 res.render('manageContacts', {
                     contacts: contacts,
                     avatars: avatars,
@@ -95,7 +94,40 @@ app.get('/manageContacts', function(req, res){
             cb()
         }
     })
-    
+});
+
+
+
+app.use('/contacts', function(req, res) {
+    if (req.method == 'GET') {
+        return res.redirect('/manageContacts');
+    } else if (req.method == 'POST') {
+        console.log("in POST app.use /contacts route!!!");
+        
+        //get data from form
+       var newContact = {
+           firstName: req.body.firstName, 
+           lastName: req.body.lastName,
+           completeName: req.body.firstName+" "+req.body.lastName,
+           address: req.body.address,
+           address2: req.body.address2,
+           country: req.body.country
+       };
+       console.log("New contact name: "+newContact.completeName);
+        
+        authorizedOperation(req, res, '/manageContacts', function(xeroClient) {
+            var contact = xeroClient.core.contacts.newContact({
+                Name: newContact.completeName
+            });
+            contact.save()
+                .then(function(ret) {
+                    res.redirect('/manageContacts')
+                })
+                .catch(function(err) {
+                    res.render('manageContacts', { outcome: 'Error', err: err })
+                })
+        })
+    }
 });
 
 app.get('/manageInvoices', function(req, res){
@@ -279,7 +311,6 @@ function authorizeRedirect(req, res, returnTo) {
 
 function authorizedOperation(req, res, returnTo, callback) {
     if (req.session.token) {
-        console.log("already OAuthed to Xero, passing xeroClient to callback function");
         callback(getXeroClient(req.session));
     } else {
       authorizeRedirect(req, res, returnTo);
