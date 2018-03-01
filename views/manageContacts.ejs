@@ -3,8 +3,30 @@
 
 <div class="ui main text container segment">
       <div id="mainBox" class="ui huge header">Manage Contacts</div>
-      
 </div>
+
+<div>
+    <h2>List of Contacts</h2>
+</div>
+
+
+<!-- semantic-UI contacts list-->
+<% var avatarArrayIndex = 0; %>
+
+<div class="ui middle aligned selection list">
+<% for (var i=0; i<contacts.length; i++) { %>
+  <div class="item">
+      <!--reset to begining of avitars -->
+      <% if (avatarArrayIndex >= avatars.length) {avatarArrayIndex = 0;} %>
+    <img class="ui avatar image" src="<%= avatars[avatarArrayIndex] %>">
+    <div class="content">
+      <div class="header"><%= contacts[i]["Name"] %></div>
+    </div>
+  </div>
+  <% avatarArrayIndex++; %>
+<% } %>
+</div>
+    
 
 
 

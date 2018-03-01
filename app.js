@@ -68,7 +68,34 @@ app.get('/organisationDetails', function(req, res){
 });
 
 app.get('/manageContacts', function(req, res){
-    res.render('manageContacts');
+    var avatars = getAvatarURLArray();
+    
+    authorizedOperation(req, res, '/manageContacts', function(xeroClient) {
+        var contacts = [];
+        xeroClient.core.contacts.getContacts({ pager: { callback: pagerCallback } })
+            .then(function() {
+                console.log("the length of the contacts array is: "+contacts.length);
+                res.render('manageContacts', {
+                    contacts: contacts,
+                    avatars: avatars,
+                    active: {
+                        contacts: true,
+                        nav: {
+                            accounting: true
+                        }
+                    }
+                });
+            })
+            .catch(function(err) {
+                handleErr(err, req, res, 'contacts');
+            })
+
+        function pagerCallback(err, response, cb) {
+            contacts.push.apply(contacts, response.data);
+            cb()
+        }
+    })
+    
 });
 
 app.get('/manageInvoices', function(req, res){
@@ -141,6 +168,31 @@ function connectedToXero(req){
     } else {
         return false;
     }
+}
+
+function getAvatarURLArray() {
+    var names = [
+        "elliot",
+        "joe",
+        "jenny",
+        "chris",
+        "steve",
+        "helen",
+        "daniel",
+        "matt",
+        "christian",
+        "stevie",
+        "ade",
+        "laura"
+        ]
+    var arrayOfURLs = [];    
+
+    for (var i=0; i<names.length; i++){
+        var newURL = "https://semantic-ui.com/images/avatar/small/"+names[i]+".jpg";
+        arrayOfURLs.push(newURL);
+    }
+    
+    return arrayOfURLs;
 }
 
 
