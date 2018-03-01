@@ -67,6 +67,17 @@ app.get('/organisationDetails', function(req, res){
     })
 });
 
+app.get('/manageContacts', function(req, res){
+    res.render('manageContacts');
+});
+
+app.get('/manageInvoices', function(req, res){
+    res.render('manageInvoices');
+});
+
+//API Connection Routes
+
+
 app.get('/connectionSettings', function(req, res){
     var connectionStatus = connectedToXero(req);
     
@@ -76,7 +87,6 @@ app.get('/connectionSettings', function(req, res){
         }
     );
 });
-
 
 app.get('/initialConnect', function(req, res){
     authorizedOperation(req, res, '/connectionSettings', function(xeroClient) {
@@ -121,7 +131,7 @@ app.get('/error', function(req, res) {
 
 
 //
-//MY HELPERS
+//MY HELPER FUNCTIONS
 //
 
 
