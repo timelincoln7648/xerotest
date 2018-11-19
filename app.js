@@ -47,8 +47,6 @@ app.get('/helloWorld', function(req, res) {
 });
 
 app.get('/organisationDetails', function(req, res){
-    console.log("loading organisation details page...");
-    //res.render('organisationDetails');
     
     authorizedOperation(req, res, '/organisationDetails', function(xeroClient) {
         xeroClient.core.organisations.getOrganisations()
@@ -106,7 +104,6 @@ app.use('/contacts', function(req, res) {
     if (req.method == 'GET') {
         return res.redirect('/manageContacts');
     } else if (req.method == 'POST') {
-        console.log("in POST app.use /contacts route!!!");
         
         //get data from form
        var newContact = {
@@ -117,7 +114,6 @@ app.use('/contacts', function(req, res) {
            address2: req.body.address2,
            country: req.body.country
        };
-       console.log("New contact name: "+newContact.completeName);
         
         authorizedOperation(req, res, '/manageContacts', function(xeroClient) {
             var contact = xeroClient.core.contacts.newContact({
