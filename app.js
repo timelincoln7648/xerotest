@@ -42,6 +42,9 @@ app.get('/', function(req, res) {
     res.render('home');
 });
 
+app.get('/helloWorld', function(req, res) {
+    res.send('Hello World!');
+});
 
 app.get('/organisationDetails', function(req, res){
     console.log("loading organisation details page...");
@@ -331,6 +334,8 @@ function handleErr(err, req, res, returnTo) {
 
 
 //start server
-app.listen(3000, process.env.IP, function(){
+module.exports = app.listen(3000, process.env.IP, function(){
     console.log("server started homie");
 });
+
+

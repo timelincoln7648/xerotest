@@ -1,14 +1,14 @@
 {
     "APPTYPE": "PARTNER",
     "partner": {
-        "authorizeCallbackUrl": "https://5fa2021472e34673b9063eb181014888.vfs.cloud9.us-east-2.amazonaws.com/access",
+        "authorizeCallbackUrl": "localhost/access",
         "consumerKey": "I4NINACRZZERNTHTARPV9DQMWABH51",
         "privateKeyPath": "privatekey.pem",
         "userAgent": "Kody Partner Test Toot Toot",
         "redirectOnError": true
     },
     "public": {
-        "authorizeCallbackUrl": "https://5fa2021472e34673b9063eb181014888.vfs.cloud9.us-east-2.amazonaws.com/access",
+        "authorizeCallbackUrl": "localhost/access",
         "consumerKey": "OIWORLLXXVYZKJ0SHXWGDC8NCEOSSD",
         "consumerSecret": "HPMCKXKKZI6VD2LTM329ZYZVZ1WW5K",
         "userAgent": "Kody Public Test Toot Toot",
