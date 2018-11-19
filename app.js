@@ -23,6 +23,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false }
+    
 }));
 
 //general setup
@@ -330,6 +331,6 @@ function handleErr(err, req, res, returnTo) {
 
 
 //start server
-app.listen(process.env.PORT, process.env.IP, function(){
+app.listen(3000, process.env.IP, function(){
     console.log("server started homie");
 });
